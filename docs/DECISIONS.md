@@ -180,3 +180,19 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   `report` and `review` rebuild the result from the warehouse (applying review actions) and
   re-render, so the sign-off copy always reflects the latest decisions.
 - **Rationale:** One source of truth (the warehouse) instead of mutable files.
+
+## D-026 Classification accuracy counts every labeled item and every false exception
+- **Decision:** The denominator is every item in labels.json (both sides of a paired break) plus
+  every exception that should have matched (truth `NONE`). A labeled item that was matched instead
+  of flagged scores as `MATCHED`.
+- **Rationale:** Scoring only the exceptions the pipeline produced would hide recall failures.
+
+## D-027 Mock evals prove the plumbing; a chaos test proves the controls
+- **Decision:** Alongside the mock eval gate, `test_unreliable_model_is_contained_by_controls`
+  runs the full pipeline with a provider that corrupts every answer (hallucinated ids,
+  side-impossible types). Expected outcome: 100% NEEDS_REVIEW, 100% correct fallback labels,
+  0% tie-out because nothing unreviewed counts.
+- **Rationale:** The mock policy shares rules with the generator's design, so its perfect score is
+  a regression gate, not evidence of model quality. The chaos run shows what a bank actually needs
+  to know: a misbehaving model degrades into human review, never into a wrong number. Live-model
+  accuracy should be measured with `tieout eval --provider gemini`. **Review.**

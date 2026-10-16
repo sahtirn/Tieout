@@ -336,5 +336,52 @@ def telemetry(
     console.print(f"[dim]* {rep['assumption_note']}[/dim]")
 
 
+@app.command("eval")
+def eval_cmd(
+    seeds: Annotated[int, typer.Option(help="Number of seeds to evaluate.")] = 25,
+    seed_start: Annotated[int, typer.Option(help="First seed.")] = 1,
+    month: Annotated[str, typer.Option(help="Period as YYYY-MM.")] = "2026-09",
+    provider: Annotated[str | None, typer.Option(help="mock or gemini.")] = None,
+    out_dir: Annotated[Path, typer.Option(help="Results directory.")] = Path("evals/results"),
+) -> None:
+    """Score the full pipeline against ground truth across seeds; non-zero exit on a miss."""
+    from tieout.evals import evaluate
+
+    settings = _settings(provider=provider)
+
+    def progress(seed: int, s: dict[str, Any]) -> None:
+        console.print(
+            f"seed {seed:>3}: {'TIED' if s['tied'] else 'UNRECONCILED':<12} "
+            f"match F1 {s['match']['f1']:.4f}  classified "
+            f"{s['classification_correct']}/{s['classification_total']}  "
+            f"needs review {s['needs_review']}"
+        )
+
+    report, json_path, md_path = evaluate(seeds, settings, out_dir, seed_start, month, progress)
+    m = report["metrics"]
+    t = Table(title=f"Eval: {report['runs']} runs ({report['provider']})")
+    t.add_column("Metric")
+    t.add_column("Result", justify="right")
+    t.add_column("Threshold", justify="right")
+    th = report["thresholds"]
+    t.add_row("Tie-out rate", f"{m['tie_out_rate']:.2%}", f"{th['tie_out_rate']:.2%}")
+    t.add_row("Match F1", f"{m['match']['f1']:.4f}", f"{th['match_f1']:.2f}")
+    t.add_row(
+        "Classification accuracy",
+        f"{m['classification_accuracy']:.4f}",
+        f"{th['classification_accuracy']:.2f}",
+    )
+    t.add_row("Adjusted balance accuracy", f"{m['adjusted_balance_accuracy']:.2%}", "")
+    t.add_row("NEEDS_REVIEW rate", f"{m['needs_review_rate']:.2%}", "")
+    t.add_row("Est. cost per run (USD)", m["cost_usd_per_run"], "")
+    console.print(t)
+    console.print(f"Results: {json_path}\nSummary: {md_path}")
+    if report["failures"]:
+        for f in report["failures"]:
+            console.print(f"[red]THRESHOLD MISSED[/red] {f}")
+        raise typer.Exit(code=1)
+    console.print("[green]All eval thresholds passed.[/green]")
+
+
 if __name__ == "__main__":  # pragma: no cover
     app()
