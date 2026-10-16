@@ -143,3 +143,28 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   `{"accepted": false, "error": ...}` rather than a new user message.
 - **Rationale:** Function-calling APIs expect every call to be answered; this keeps the
   conversation well-formed for Gemini while giving the model the exact control that failed.
+
+## D-021 Bulk loads stage through a temporary CSV and COPY
+- **Decision:** `DuckDBWarehouse` writes bulk rows to a temporary CSV (every value a quoted
+  string, NULL as `\N`) and loads it with `COPY`. Single-row writes still use bound parameters.
+- **Alternatives:** `executemany`; multi-row `INSERT ... VALUES` with bound parameters.
+- **Rationale:** Profiling showed DuckDB's Python binder probing for pandas on every bound value
+  (about 250 microseconds each), which made a single reconcile spend most of its time binding. COPY
+  is about 100x faster, keeps Decimal precision exact, and mirrors a Snowflake stage plus
+  `COPY INTO`. Test suite time dropped from 69 s to 10 s.
+
+## D-022 Review actions are append-only and enforce maker-checker
+- **Decision:** `review_actions` is insert-only; current state is derived by replaying actions in
+  order, so a changed decision is visible in the trail. A reviewer whose name matches the run's
+  preparer (case-insensitive) is refused. Rejections require a note. UNIDENTIFIED findings cannot
+  be approved as-is.
+- **Rationale:** These are the minimum controls a SOX-minded reviewer expects. Identity here is a
+  name string; in production it would come from SSO. **Review.**
+
+## D-023 Audit trail = entity records plus one trace per reconciling item
+- **Decision:** `tieout audit` writes JSONL with run, source_row, match, exception, agent_step,
+  llm_call, finding, journal_entry, review_action, and tieout records, plus a
+  `reconciling_item_trace` per finding that inlines source rows, step summary, classification,
+  schedule section and amount, JE ids, and review actions.
+- **Rationale:** Entity records support machine analysis; trace records let a human follow one
+  item without joining anything.

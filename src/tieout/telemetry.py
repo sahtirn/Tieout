@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 from tieout.config import AssumptionsConfig, PricingConfig
-from tieout.warehouse.base import LLMCallRecord
+from tieout.warehouse.base import LLMCallRecord, Warehouse
 
 MICRO = Decimal("0.000001")
 MILLION = Decimal(1_000_000)
@@ -105,3 +106,46 @@ def estimate_roi(
         net_usd=(value - llm_cost).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP),
         note=assumptions.note,
     )
+
+
+def telemetry_report(wh: Warehouse) -> dict[str, Any]:
+    """Totals plus a per-run breakdown of LLM usage, cost, latency, failures, and assumed ROI."""
+    runs = []
+    all_calls: list[LLMCallRecord] = []
+    minutes = Decimal("0")
+    value = Decimal("0")
+    for run in wh.list_runs():
+        calls = wh.get_llm_calls(run.run_id)
+        all_calls.extend(calls)
+        s = summarize(calls)
+        roi = (run.result or {}).get("roi", {})
+        run_minutes = Decimal(roi.get("analyst_minutes_saved_ASSUMPTION", "0"))
+        run_value = Decimal(roi.get("analyst_value_usd_ASSUMPTION", "0"))
+        minutes += run_minutes
+        value += run_value
+        findings = (run.result or {}).get("summary", {}).get("findings", 0)
+        runs.append(
+            {
+                "run_id": run.run_id,
+                "started_at": run.started_at.isoformat(),
+                "period": run.period,
+                "status": run.status,
+                "provider": run.provider,
+                "model": run.model,
+                "exceptions_investigated": findings,
+                **s.as_dict(),
+                "analyst_minutes_saved_ASSUMPTION": format(run_minutes, "f"),
+            }
+        )
+    total = summarize(all_calls)
+    return {
+        "totals": {
+            "runs": len(runs),
+            **total.as_dict(),
+            "analyst_minutes_saved_ASSUMPTION": format(minutes, "f"),
+            "analyst_value_usd_ASSUMPTION": format(value, "f"),
+        },
+        "runs": runs,
+        "assumption_note": "Minutes saved and value are estimates from config/assumptions.yaml, "
+        "not measurements. LLM prices are estimates from config/pricing.yaml.",
+    }
