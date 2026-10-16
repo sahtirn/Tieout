@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     max_agent_steps: int = Field(default=6, ge=1, le=50)
     db_path: str = "tieout.duckdb"
     runs_dir: str = "runs"
-    near_similarity_threshold: float = Field(default=0.55, ge=0, le=1)
+    near_similarity_threshold: float = Field(default=0.78, ge=0, le=1)
     batch_max_items: int = Field(default=5, ge=2, le=8)
     batch_time_budget_ms: int = Field(default=2000, ge=10)
     prompt_version: str = "investigator_v1"

@@ -60,3 +60,28 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
 - **Decision:** Ledger money is quantized to 0.01. Estimated LLM cost is stored as DECIMAL(18,6).
 - **Rationale:** A single Flash call costs a fraction of a cent, so cents would round every call to
   zero and make telemetry useless. Cost never touches a ledger balance.
+
+## D-010 Description similarity = mean of token-set and leading-token similarity
+- **Decision:** After removing transaction-type stopwords and all numeric tokens, similarity is the
+  mean of rapidfuzz `token_set_ratio` and the ratio of the first remaining token. Near-match
+  threshold defaults to 0.78. Check numbers and references are compared exactly and score 1.0.
+- **Alternatives:** Plain `token_set_ratio`, `partial_ratio`, `WRatio`.
+- **Rationale:** Measured on 19 seeds: plain token-set put legitimate pairs as low as 0.70 while
+  unrelated payees sharing a word like "supply" reached 1.00. The blended score separates them
+  cleanly (legitimate minimum 0.85, unrelated maximum 0.73), because banks truncate payee names but
+  rarely change the first word. Numbers are excluded because check serials one digit apart are
+  fuzzy-similar but are different checks.
+
+## D-011 A `match_items` child table enforces "matched at most once"
+- **Decision:** Alongside `matches`, a `match_items(run_id, side, item_id)` table with that primary
+  key records every matched item.
+- **Rationale:** The invariant becomes a database constraint, not just application logic, and the
+  candidate queries can exclude matched items with a set-based `NOT EXISTS` anti-join.
+
+## D-012 Many-to-one refuses ambiguity
+- **Decision:** The subset-sum search collects up to three exact solutions. One solution matches.
+  Several solutions match only if one sits strictly closest to the deposit date; otherwise the
+  deposit stays unmatched and is listed in `batch_ambiguous`. The search uses integer cents and a
+  per-run time budget (`BATCH_TIME_BUDGET_MS`) and stops cleanly when the budget is spent.
+- **Rationale:** A wrong batch match silently hides two errors. An unmatched deposit is visible
+  and goes to investigation.
