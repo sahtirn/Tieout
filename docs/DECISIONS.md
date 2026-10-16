@@ -85,3 +85,26 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   per-run time budget (`BATCH_TIME_BUDGET_MS`) and stops cleanly when the budget is spent.
 - **Rationale:** A wrong batch match silently hides two errors. An unmatched deposit is visible
   and goes to investigation.
+
+## D-013 TIED is necessary, not sufficient
+- **Decision:** Evals score adjusted-balance accuracy against ground truth in addition to tie-out
+  rate, and the agent's findings pass side and sign rules before they reach the schedule.
+- **Rationale:** The reconciliation difference is linear: a bank-side adjustment of +x and a
+  book-side adjustment of -x move it identically. Calling a deposit in transit a GL duplicate
+  therefore still ties while misstating both adjusted balances (covered by
+  `test_side_swapped_misclassification_still_ties_but_misstates_balance`). A controller signing
+  off on "TIED" needs the classification controls too. **Review.**
+
+## D-014 Only auto-accepted or reviewer-approved findings enter the schedule
+- **Decision:** NEEDS_REVIEW findings are excluded from the schedule. Their items appear as
+  unexplained, so the rec reports UNRECONCILED with the exact amount at stake until a reviewer
+  approves them in `tieout review`. Rejected findings stay out.
+- **Alternatives:** Count low-confidence classifications provisionally.
+- **Rationale:** A model guess that fails a control must not be able to make the rec tie. Human
+  approval, not model confidence, closes the gap.
+
+## D-015 JEs are proposed for every non-rejected book-side finding
+- **Decision:** Book-side findings get a balanced two-line proposal even while NEEDS_REVIEW (the
+  memo says so). Every JE starts as PENDING_APPROVAL. Bank-side items never get a JE.
+- **Rationale:** The reviewer sees the full consequence of approving a classification in one
+  place. Posting remains a human decision.

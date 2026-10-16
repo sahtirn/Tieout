@@ -20,7 +20,7 @@ from datetime import timedelta
 from typing import Any
 
 from tieout.config import Settings
-from tieout.models import GLEntry, Match, MatchRule
+from tieout.models import BankTransaction, GLEntry, Match, MatchRule, ReconException
 from tieout.money import cents_to_money, money_to_cents
 from tieout.similarity import pair_similarity
 from tieout.warehouse.base import CandidatePair, Warehouse
@@ -270,3 +270,26 @@ def _pick_unique(solutions: list[list[GLEntry]], bank_ordinal: int) -> list[GLEn
     if spread(ranked[0]) == spread(ranked[1]):
         return None
     return ranked[0]
+
+
+def exceptions_from_unmatched(
+    bank: list[BankTransaction], gl: list[GLEntry]
+) -> list[ReconException]:
+    """Every unmatched item becomes an exception. Bank items first, then GL, each by date."""
+    out: list[ReconException] = []
+    items: list[BankTransaction | GLEntry] = [
+        *sorted(bank, key=lambda b: (b.txn_date, b.txn_id)),
+        *sorted(gl, key=lambda g: (g.entry_date, g.entry_id)),
+    ]
+    for n, item in enumerate(items, start=1):
+        out.append(
+            ReconException(
+                exception_id=f"EXC-{n:04d}",
+                side=item.side,
+                item_id=item.item_id,
+                item_date=item.item_date,
+                amount=item.amount,
+                description=item.description,
+            )
+        )
+    return out
