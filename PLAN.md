@@ -61,6 +61,6 @@ CSV inputs ──► io (parse + normalize sign) ──► Warehouse (DuckDB)
 - [x] Phase 7: evals
 - [x] Phase 8: API
 - [x] Phase 9: CI, docs, sample run
-- [ ] Phase 10: final verification
+- [x] Phase 10: final verification
 
 Each phase gate: `ruff check`, `ruff format --check`, `mypy`, `pytest` all green before the next phase.

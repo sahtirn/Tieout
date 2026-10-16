@@ -196,3 +196,11 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   a regression gate, not evidence of model quality. The chaos run shows what a bank actually needs
   to know: a misbehaving model degrades into human review, never into a wrong number. Live-model
   accuracy should be measured with `tieout eval --provider gemini`. **Review.**
+
+## D-028 Commits are local only
+- **Decision:** All work is committed phase by phase on branch
+  `claude/tieout-bank-reconciliation-m7gw5n`. Nothing was pushed, no remote was created, and no
+  pull request was opened, per the brief.
+- **Rationale:** The brief said not to push. The build ran in an ephemeral cloud container, so the
+  owner needs to push the branch (or approve a push) before that container is reclaimed.
+  **Review.**
