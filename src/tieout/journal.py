@@ -68,7 +68,11 @@ def propose_journal_entries(
     out: list[JournalEntryProposal] = []
     for f in findings:
         bt = f.finding.break_type
-        if bt in BANK_SIDE_ADJUSTMENTS or f.review_status == ReviewStatus.REJECTED:
+        if (
+            bt in BANK_SIDE_ADJUSTMENTS
+            or bt == BreakType.UNIDENTIFIED
+            or f.review_status == ReviewStatus.REJECTED
+        ):
             continue
         effect = adjustment_for(f, amounts)
         if effect == ZERO:

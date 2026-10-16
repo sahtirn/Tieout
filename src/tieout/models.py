@@ -38,6 +38,8 @@ class BreakType(StrEnum):
     GL_TRANSPOSITION = "GL_TRANSPOSITION"
     GL_WRONG_AMOUNT = "GL_WRONG_AMOUNT"
     BANK_ERROR = "BANK_ERROR"
+    # Honest "cannot determine". Never counted on the schedule; always routed to a reviewer.
+    UNIDENTIFIED = "UNIDENTIFIED"
 
 
 # Which ledger an item must live on for a given break type, and the required sign of its amount.
@@ -51,6 +53,7 @@ BREAK_SIDE: dict[BreakType, Side | None] = {
     BreakType.BANK_ERROR: Side.BANK,
     BreakType.GL_TRANSPOSITION: None,  # either side; requires a counterpart on the other side
     BreakType.GL_WRONG_AMOUNT: None,
+    BreakType.UNIDENTIFIED: None,
 }
 BREAK_SIGN: dict[BreakType, int] = {
     BreakType.DEPOSIT_IN_TRANSIT: 1,
@@ -297,3 +300,7 @@ class RunMetadata(_Frozen):
     model: str
     prompt_version: str
     preparer: str
+    bank_opening_balance: Money
+    bank_ending_balance: Money
+    gl_opening_balance: Money
+    gl_ending_balance: Money

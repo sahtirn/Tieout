@@ -108,3 +108,38 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   memo says so). Every JE starts as PENDING_APPROVAL. Bank-side items never get a JE.
 - **Rationale:** The reviewer sees the full consequence of approving a classification in one
   place. Posting remains a human decision.
+
+## D-016 One deterministic policy powers both MockProvider and the fallback classifier
+- **Decision:** `agent/policy.py` decides the next tool call from prior observations, then a
+  final finding. MockProvider replays it through the real message and tool-calling protocol; the
+  fallback classifier runs it directly against the tools.
+- **Alternatives:** A mock that returns canned answers; a separate fallback rule engine.
+- **Rationale:** CI and evals exercise the exact loop, logging, validation, and telemetry a live
+  model uses, and the fallback cannot drift from what the evals measure.
+
+## D-017 The final answer is a `submit_finding` function call, with function calling mode ANY
+- **Decision:** The AgentFinding schema is exposed as a tool. Gemini runs with
+  `FunctionCallingConfig(mode="ANY")`, so every turn is structured. A text answer is still parsed
+  leniently (first JSON object) and validated like any other.
+- **Rationale:** Structured arguments are more reliable than JSON-in-text, and combining a
+  response schema with tools is not supported uniformly across models.
+
+## D-018 `AgentFinding` gains `counterpart_id`, and an `UNIDENTIFIED` break type exists
+- **Decision:** Transpositions and wrong amounts involve two items, so the finding names the
+  opposite-ledger counterpart and code re-verifies the claim (digit swap, sign, unmatched). An
+  explicit `UNIDENTIFIED` type lets the model (or fallback) say "cannot determine"; it is always
+  routed to review, never counted on the schedule, and cannot be approved as-is.
+- **Rationale:** Forcing a guess into one of nine buckets would make a wrong classification look
+  confident. **Review:** this extends the enum in the brief.
+
+## D-019 Exceptions are investigated bank side first; paired items are skipped
+- **Decision:** Bank exceptions are investigated before GL exceptions. When a finding names a
+  counterpart, that item is marked resolved and is not investigated separately.
+- **Rationale:** The bank side of a transposition or wrong amount carries the true amount, and
+  pairing once avoids double-counting the correction on the schedule.
+
+## D-020 Validation errors go back to the model as the `submit_finding` tool result
+- **Decision:** On the single retry, the rejected call is answered with
+  `{"accepted": false, "error": ...}` rather than a new user message.
+- **Rationale:** Function-calling APIs expect every call to be answered; this keeps the
+  conversation well-formed for Gemini while giving the model the exact control that failed.

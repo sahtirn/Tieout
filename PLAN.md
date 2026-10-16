@@ -55,7 +55,7 @@ CSV inputs ──► io (parse + normalize sign) ──► Warehouse (DuckDB)
 - [x] Phase 1: domain models and synthetic data generator
 - [x] Phase 2: storage and deterministic matching engine
 - [x] Phase 3: tie-out schedule and JE proposals
-- [ ] Phase 4: exception investigation agent
+- [x] Phase 4: exception investigation agent
 - [ ] Phase 5: telemetry, audit trail, human review
 - [ ] Phase 6: reports and CLI
 - [ ] Phase 7: evals

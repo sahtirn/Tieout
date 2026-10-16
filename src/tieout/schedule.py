@@ -76,7 +76,7 @@ def build_tieout(
     }
     covered: set[str] = set()
     for f in findings:
-        if not f.counted_in_schedule:
+        if not f.counted_in_schedule or f.finding.break_type == BreakType.UNIDENTIFIED:
             continue
         bt = f.finding.break_type
         amount = adjustment_for(f, amounts)
