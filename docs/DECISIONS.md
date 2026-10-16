@@ -197,10 +197,11 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   to know: a misbehaving model degrades into human review, never into a wrong number. Live-model
   accuracy should be measured with `tieout eval --provider gemini`. **Review.**
 
-## D-028 Commits are local only
-- **Decision:** All work is committed phase by phase on branch
-  `claude/tieout-bank-reconciliation-m7gw5n`. Nothing was pushed, no remote was created, and no
-  pull request was opened, per the brief.
-- **Rationale:** The brief said not to push. The build ran in an ephemeral cloud container, so the
-  owner needs to push the branch (or approve a push) before that container is reclaimed.
-  **Review.**
+## D-028 Branch pushed on the owner's instruction; no pull request
+- **Decision:** All work was committed phase by phase on branch
+  `claude/tieout-bank-reconciliation-m7gw5n`. Per the brief, nothing was pushed during the build
+  and no remote was created. After the build, the owner explicitly asked for the branch to be
+  pushed to the existing `origin`, and it was. No pull request has been opened.
+- **Rationale:** The brief's "do not push" held for the build itself. The work ran in an ephemeral
+  cloud container, so pushing on the owner's instruction was the only way to keep it once the
+  container is reclaimed.
