@@ -1,0 +1,6 @@
+# ASSUMPTIONS used for the "analyst minutes saved" estimate. These are not measurements.
+# Replace with time-study numbers from your own close process before quoting ROI.
+note: "Assumed manual effort per item; replace with your own time-study data."
+minutes_per_matched_item: "0.5"
+minutes_per_exception: "12"
+analyst_hourly_rate: "65.00"

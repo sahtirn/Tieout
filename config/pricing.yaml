@@ -1,0 +1,21 @@
+# ESTIMATES ONLY. Verify against Google's current Gemini API pricing page before relying on any
+# cost figure. Prices are USD per 1M tokens, paid tier, text. Written as strings so they parse as
+# Decimal without float rounding.
+currency: USD
+note: "Estimated list prices to verify. Last reviewed 2026-10; prices change without notice."
+models:
+  mock:
+    input_per_million: "0"
+    output_per_million: "0"
+  gemini-3.6-flash:
+    input_per_million: "0.50"
+    output_per_million: "3.00"
+  gemini-3.5-flash:
+    input_per_million: "0.50"
+    output_per_million: "3.00"
+  gemini-flash-latest:
+    input_per_million: "0.50"
+    output_per_million: "3.00"
+  default:
+    input_per_million: "0.50"
+    output_per_million: "3.00"

@@ -1,0 +1,19 @@
+# Chart of accounts used for proposed adjusting journal entries (fictional).
+cash:
+  number: "1010"
+  name: "Cash - Operating Account"
+# Offset accounts for book-side items that originate on the bank statement.
+break_types:
+  BANK_FEE_UNRECORDED: { number: "6110", name: "Bank Service Charges" }
+  INTEREST_UNRECORDED: { number: "4910", name: "Interest Income" }
+  NSF_RETURN_UNRECORDED: { number: "1200", name: "Accounts Receivable" }
+# Offset accounts for book errors (duplicates, transpositions, wrong amounts), keyed by the GL
+# source journal of the entry being corrected.
+journal_offsets:
+  AP: { number: "2000", name: "Accounts Payable" }
+  AR: { number: "1200", name: "Accounts Receivable" }
+  PR: { number: "2100", name: "Accrued Payroll" }
+  CD: { number: "2000", name: "Accounts Payable" }
+  CR: { number: "1200", name: "Accounts Receivable" }
+  GJ: { number: "1999", name: "Reconciliation Suspense" }
+default_offset: { number: "1999", name: "Reconciliation Suspense" }
