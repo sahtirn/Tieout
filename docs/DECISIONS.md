@@ -168,3 +168,15 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
   schedule section and amount, JE ids, and review actions.
 - **Rationale:** Entity records support machine analysis; trace records let a human follow one
   item without joining anything.
+
+## D-024 Config and prompts resolve from the repo first, then from the wheel
+- **Decision:** `config/` and `prompts/` live at the repo root as requested, and the wheel build
+  force-includes copies under `tieout/_data/`. At runtime the repo copy wins when present.
+- **Rationale:** Editable installs keep the files reviewers edit in obvious places, and a plain
+  `pip install .` still works.
+
+## D-025 Reports re-render from stored state
+- **Decision:** `reconcile` writes `runs/<run_id>/report.html`, `report.md`, and `result.json`.
+  `report` and `review` rebuild the result from the warehouse (applying review actions) and
+  re-render, so the sign-off copy always reflects the latest decisions.
+- **Rationale:** One source of truth (the warehouse) instead of mutable files.

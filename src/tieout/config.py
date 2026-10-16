@@ -12,8 +12,17 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_CONFIG_DIR = PROJECT_ROOT / "config"
-DEFAULT_PROMPTS_DIR = PROJECT_ROOT / "prompts"
+_PACKAGED = Path(__file__).resolve().parent / "_data"
+
+
+def _resolve(name: str) -> Path:
+    """Repo checkout (editable install) first, then the copy packaged into the wheel."""
+    repo = PROJECT_ROOT / name
+    return repo if repo.is_dir() else _PACKAGED / name
+
+
+DEFAULT_CONFIG_DIR = _resolve("config")
+DEFAULT_PROMPTS_DIR = _resolve("prompts")
 
 
 class Settings(BaseSettings):

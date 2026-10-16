@@ -57,7 +57,7 @@ CSV inputs ──► io (parse + normalize sign) ──► Warehouse (DuckDB)
 - [x] Phase 3: tie-out schedule and JE proposals
 - [x] Phase 4: exception investigation agent
 - [x] Phase 5: telemetry, audit trail, human review
-- [ ] Phase 6: reports and CLI
+- [x] Phase 6: reports and CLI
 - [ ] Phase 7: evals
 - [ ] Phase 8: API
 - [ ] Phase 9: CI, docs, sample run

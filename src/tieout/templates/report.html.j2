@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bank Reconciliation {{ r.period }} | {{ r.entity }}</title>
+<style>
+  :root {
+    --ink: #1c2430; --muted: #5b6676; --rule: #d9dee5; --soft: #f5f7fa; --paper: #ffffff;
+    --ok: #146c43; --ok-bg: #e6f4ec; --bad: #b42318; --bad-bg: #fdecea; --warn: #8a5a00;
+    --warn-bg: #fff4dc; --accent: #23395d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #eef1f5; color: var(--ink);
+         font: 14px/1.5 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .page { max-width: 1080px; margin: 24px auto; background: var(--paper); padding: 40px 48px;
+          box-shadow: 0 1px 3px rgba(16,24,40,.12); }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.01em; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent);
+       border-bottom: 2px solid var(--accent); padding-bottom: 4px; margin: 32px 0 12px; }
+  h3 { font-size: 14px; margin: 18px 0 6px; }
+  .muted { color: var(--muted); }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px;
+            border-bottom: 1px solid var(--rule); padding-bottom: 16px; }
+  .header dl { display: grid; grid-template-columns: auto auto; gap: 2px 12px; margin: 8px 0 0;
+               font-size: 13px; }
+  .header dt { color: var(--muted); }
+  .header dd { margin: 0; }
+  .badge { display: inline-block; font-weight: 700; font-size: 15px; letter-spacing: .08em;
+           padding: 8px 16px; border-radius: 4px; border: 2px solid; white-space: nowrap; }
+  .badge.tied { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); }
+  .badge.unrec { color: var(--bad); background: var(--bad-bg); border-color: var(--bad); }
+  .kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 20px; }
+  .kpi { background: var(--soft); border: 1px solid var(--rule); border-radius: 4px;
+         padding: 10px 12px; }
+  .kpi .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top;
+           text-align: left; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+       background: var(--soft); }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .schedule { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .schedule table td { border-bottom: none; padding: 3px 8px; }
+  .schedule .detail td { color: var(--muted); font-size: 12.5px; padding-left: 24px; }
+  .schedule .sub td { border-top: 1px solid var(--ink); font-weight: 600; }
+  .schedule .grand td { border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink);
+                        font-weight: 700; }
+  .diff { margin-top: 16px; padding: 14px 18px; border-radius: 4px; display: flex;
+          justify-content: space-between; align-items: center; font-size: 16px; font-weight: 700; }
+  .diff.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok); }
+  .diff.bad { background: var(--bad-bg); color: var(--bad); border: 2px solid var(--bad); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 7px;
+          border-radius: 10px; white-space: nowrap; }
+  .pill.AUTO_ACCEPTED, .pill.APPROVED { background: var(--ok-bg); color: var(--ok); }
+  .pill.NEEDS_REVIEW, .pill.PENDING_APPROVAL { background: var(--warn-bg); color: var(--warn); }
+  .pill.REJECTED { background: var(--bad-bg); color: var(--bad); }
+  td.ids, td.date { white-space: nowrap; }
+  .ids { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+  .je { border: 1px solid var(--rule); border-radius: 4px; margin: 10px 0; }
+  .je .head { display: flex; justify-content: space-between; gap: 12px; background: var(--soft);
+              padding: 6px 10px; font-size: 13px; }
+  .je table th { background: none; }
+  .callout { background: var(--warn-bg); border-left: 4px solid var(--warn); padding: 10px 14px;
+             margin: 8px 0; }
+  .callout.bad { background: var(--bad-bg); border-left-color: var(--bad); }
+  .meta { font-size: 12.5px; }
+  .meta td:first-child { color: var(--muted); width: 200px; }
+  .signoff { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+  .sig .line { border-bottom: 1px solid var(--ink); height: 36px; }
+  .sig .cap { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between;
+              margin-top: 4px; }
+  .footnote { font-size: 11.5px; color: var(--muted); margin-top: 28px; }
+  @media (max-width: 760px) {
+    .page { padding: 20px 16px; margin: 0; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .schedule, .signoff { grid-template-columns: 1fr; }
+    .header { flex-direction: column; }
+    .scroll { overflow-x: auto; }
+  }
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; max-width: none; padding: 0; }
+    h2 { break-after: avoid; }
+    .je, tr { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="header">
+    <div>
+      <div class="muted">Bank Reconciliation Workpaper</div>
+      <h1>{{ r.entity }}</h1>
+      <dl>
+        <dt>Account</dt><dd>{{ r.account }}</dd>
+        <dt>Period</dt><dd>{{ tie.period }} (month end)</dd>
+        <dt>Run ID</dt><dd class="ids">{{ r.run_id }}</dd>
+        <dt>Generated</dt><dd>{{ generated_at }}</dd>
+      </dl>
+    </div>
+    <div>
+      {% if tied %}
+      <span class="badge tied">TIED</span>
+      {% else %}
+      <span class="badge unrec">UNRECONCILED</span>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">{{ r.summary.bank_lines }}</div><div class="l">Bank lines</div></div>
+    <div class="kpi"><div class="v">{{ r.summary.gl_lines }}</div><div class="l">GL lines</div></div>
+    <div class="kpi"><div class="v">{{ r.summary.matches }}</div><div class="l">Matches</div></div>
+    <div class="kpi"><div class="v">{{ r.summary.exceptions }}</div><div class="l">Exceptions</div></div>
+    <div class="kpi"><div class="v">{{ r.summary.findings_by_status.NEEDS_REVIEW }}</div><div class="l">Needs review</div></div>
+    <div class="kpi"><div class="v">{{ tie.difference | money }}</div><div class="l">Difference</div></div>
+  </div>
+
+  <h2>Reconciliation schedule</h2>
+  <div class="schedule">
+    <table aria-label="Bank side">
+      <tr><td>Balance per bank statement</td><td class="num">{{ tie.bank_ending_balance | money }}</td></tr>
+      <tr><td>Add: deposits in transit</td><td class="num">{{ totals.deposits_in_transit | money }}</td></tr>
+      {% for ln in tie.deposits_in_transit %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span></td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr><td>Less: outstanding checks</td><td class="num">{{ totals.outstanding_checks | money }}</td></tr>
+      {% for ln in tie.outstanding_checks %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span></td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr><td>Add/(less): bank errors</td><td class="num">{{ totals.bank_errors | money }}</td></tr>
+      {% for ln in tie.bank_errors %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span></td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr class="grand"><td>Adjusted bank balance</td><td class="num">{{ tie.adjusted_bank_balance | money }}</td></tr>
+    </table>
+    <table aria-label="Book side">
+      <tr><td>Balance per general ledger</td><td class="num">{{ tie.gl_ending_balance | money }}</td></tr>
+      <tr><td>Add: unrecorded bank credits</td><td class="num">{{ totals.unrecorded_credits | money }}</td></tr>
+      {% for ln in tie.unrecorded_credits %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span> {{ labels[ln.break_type] }}</td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr><td>Less: unrecorded bank debits</td><td class="num">{{ totals.unrecorded_debits | money }}</td></tr>
+      {% for ln in tie.unrecorded_debits %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span> {{ labels[ln.break_type] }}</td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr><td>Add/(less): book errors</td><td class="num">{{ totals.book_errors | money }}</td></tr>
+      {% for ln in tie.book_errors %}
+      <tr class="detail"><td><span class="ids">{{ ln.item_ids | join(", ") }}</span> {{ labels[ln.break_type] }}</td><td class="num">{{ ln.amount | money }}</td></tr>
+      {% endfor %}
+      <tr class="grand"><td>Adjusted book balance</td><td class="num">{{ tie.adjusted_book_balance | money }}</td></tr>
+    </table>
+  </div>
+  {% if tied %}
+  <div class="diff ok"><span>Difference (adjusted bank less adjusted book)</span><span>{{ tie.difference | money }}</span></div>
+  {% else %}
+  <div class="diff bad"><span>UNEXPLAINED DIFFERENCE (adjusted bank less adjusted book)</span><span>{{ tie.difference | money }}</span></div>
+  <div class="callout bad">This reconciliation does not tie. The difference above is not plugged.
+    {{ tie.unexplained_items | length }} item(s) are not yet explained by an accepted or approved
+    finding and are listed below.</div>
+  {% endif %}
+
+  {% if tie.unexplained_items %}
+  <h3>Unexplained items</h3>
+  <div class="scroll"><table>
+    <tr><th>Exception</th><th>Ledger</th><th>Item</th><th>Date</th><th>Description</th><th class="num">Amount</th></tr>
+    {% for e in tie.unexplained_items %}
+    <tr><td class="ids">{{ e.exception_id }}</td><td>{{ e.side }}</td><td class="ids">{{ e.item_id }}</td><td>{{ e.item_date }}</td><td>{{ e.description }}</td><td class="num">{{ e.amount | money }}</td></tr>
+    {% endfor %}
+  </table></div>
+  {% endif %}
+
+  <h2>Reconciling items</h2>
+  {% for g in groups %}
+  <h3>{{ g.label }} <span class="muted">({{ g.rows | length }})</span></h3>
+  <div class="scroll"><table>
+    <tr><th>Item(s)</th><th>Date</th><th class="num">Amount</th><th>Explanation</th><th>Evidence</th><th>Status</th></tr>
+    {% for row in g.rows %}
+    <tr>
+      <td class="ids">{% for it in row["items"] %}{{ it.item_id }}<br>{% endfor %}<span class="muted">{{ row.exception_id }}</span></td>
+      <td class="date">{% for it in row["items"] %}{{ it.item_date }}<br>{% endfor %}</td>
+      <td class="num">{% for it in row["items"] %}{{ it.amount | money }}<br>{% endfor %}</td>
+      <td>{{ row.explanation }}<br><span class="muted">Action: {{ row.proposed_action }}</span></td>
+      <td class="ids">{{ row.evidence_ids | join("<br>"|safe) }}</td>
+      <td><span class="pill {{ row.review_status }}">{{ row.review_status | replace("_", " ") }}</span><br>
+        <span class="muted">{{ row.source | lower }}, conf {{ "%.2f" | format(row.confidence) }}</span>
+        {% for reason in row.review_reasons %}<br><span class="muted">{{ reason }}</span>{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table></div>
+  {% endfor %}
+
+  <h2>Proposed adjusting journal entries</h2>
+  {% if not r.journal_entries %}<p class="muted">No book-side adjustments proposed.</p>{% endif %}
+  {% for je in r.journal_entries %}
+  <div class="je">
+    <div class="head"><span><strong>{{ je.je_id }}</strong> &middot; {{ je.memo }}</span><span class="pill {{ je.status }}">{{ je.status | replace("_", " ") }}</span></div>
+    <table>
+      <tr><th>Account</th><th>Name</th><th class="num">Debit</th><th class="num">Credit</th></tr>
+      {% for ln in je.lines %}
+      <tr><td class="ids">{{ ln.account }}</td><td>{{ ln.account_name }}</td><td class="num">{{ ln.debit | money if ln.debit != "0.00" else "" }}</td><td class="num">{{ ln.credit | money if ln.credit != "0.00" else "" }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endfor %}
+
+  <h2>Needs review queue</h2>
+  {% if review_queue %}
+  <div class="callout">{{ review_queue | length }} finding(s) require a human decision before they count
+    on the schedule. Use <code>tieout review {{ r.run_id }}</code>.</div>
+  <div class="scroll"><table>
+    <tr><th>Exception</th><th>Item</th><th>Proposed type</th><th>Source</th><th>Reasons</th></tr>
+    {% for f in review_queue %}
+    <tr><td class="ids">{{ f.exception_id }}</td><td class="ids">{{ f.item_id }}</td><td>{{ f.finding.break_type }}</td><td>{{ f.source }}</td><td>{{ f.review_reasons | join("; ") }}</td></tr>
+    {% endfor %}
+  </table></div>
+  {% else %}
+  <p class="muted">No findings are awaiting review. {{ pending_jes | length }} proposed journal entr{{ "y" if pending_jes | length == 1 else "ies" }} await posting approval.</p>
+  {% endif %}
+
+  <h2>Matching and AI telemetry</h2>
+  <div class="scroll"><table class="meta">
+    <tr><td>Matches by rule</td><td>{% for rule, n in r.summary.matches_by_rule | dictsort %}{{ rule }} {{ n }}{{ ", " if not loop.last }}{% endfor %} ({{ r.summary.matched_items }} items)</td></tr>
+    <tr><td>LLM calls</td><td>{{ r.telemetry.calls }} ({{ r.telemetry.failed_calls }} failed, {{ r.telemetry.failure_rate | pct }} failure rate, {{ r.telemetry.retries }} retries)</td></tr>
+    <tr><td>Tokens</td><td>{{ "{:,}".format(r.telemetry.input_tokens) }} in / {{ "{:,}".format(r.telemetry.output_tokens) }} out</td></tr>
+    <tr><td>Estimated LLM cost</td><td>${{ r.telemetry.cost_usd }} <span class="muted">(estimate from config/pricing.yaml)</span></td></tr>
+    <tr><td>Average latency</td><td>{{ r.telemetry.avg_latency_ms }} ms per call</td></tr>
+    <tr><td>Analyst time saved</td><td>{{ r.roi.analyst_minutes_saved_ASSUMPTION }} minutes, about ${{ r.roi.analyst_value_usd_ASSUMPTION }} <span class="muted">(ASSUMPTION: {{ r.roi.note }})</span></td></tr>
+  </table></div>
+
+  <h2>Run metadata</h2>
+  <div class="scroll"><table class="meta">
+    <tr><td>Run ID</td><td class="ids">{{ meta.run_id }}</td></tr>
+    <tr><td>Started / finished (UTC)</td><td>{{ meta.started_at }} / {{ meta.finished_at }}</td></tr>
+    <tr><td>Provider / model</td><td>{{ meta.provider }} / {{ meta.model }}</td></tr>
+    <tr><td>Prompt version</td><td>{{ meta.prompt_version }}</td></tr>
+    <tr><td>Code version (git)</td><td class="ids">{{ meta.git_commit or "not available" }}</td></tr>
+    <tr><td>Opening balances</td><td>Bank {{ meta.bank_opening_balance | money }} / GL {{ meta.gl_opening_balance | money }}</td></tr>
+    {% for f in meta.inputs %}
+    <tr><td>Input: {{ f.role }}</td><td><span class="ids">{{ f.filename }}</span>, {{ f.rows }} rows<br><span class="ids">sha256 {{ f.sha256 }}</span></td></tr>
+    {% endfor %}
+    <tr><td>Key settings</td><td>date window {{ meta.config_snapshot.date_window_days }} days, near-match similarity {{ meta.config_snapshot.near_similarity_threshold }}, review threshold {{ meta.config_snapshot.review_confidence_threshold }}, max agent steps {{ meta.config_snapshot.max_agent_steps }}</td></tr>
+  </table></div>
+
+  <section class="signoff">
+    <div class="sig"><div class="line"></div><div class="cap"><span>Prepared by: {{ meta.preparer }}</span><span>Date</span></div></div>
+    <div class="sig"><div class="line"></div><div class="cap"><span>Reviewed by</span><span>Date</span></div></div>
+  </section>
+
+  <p class="footnote">All arithmetic in this workpaper (matching, balances, schedule, journal entry
+    amounts) is computed by deterministic code with Decimal money rounded half-up to the cent. The
+    language model only classified exceptions and wrote explanations; every finding passed
+    evidence, side, sign, and pairing controls before it was counted. Synthetic data; not
+    affiliated with any real entity.</p>
+</main>
+</body>
+</html>

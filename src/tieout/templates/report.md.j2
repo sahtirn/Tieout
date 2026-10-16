@@ -1,0 +1,104 @@
+# Bank Reconciliation: {{ r.entity }}
+
+| | |
+| --- | --- |
+| Account | {{ r.account }} |
+| Period | {{ tie.period }} |
+| Status | **{{ r.status }}** |
+| Difference | **{{ tie.difference | money }}** |
+| Run ID | `{{ r.run_id }}` |
+| Generated | {{ generated_at }} |
+
+## Reconciliation schedule
+
+| Bank side | Amount |
+| --- | ---: |
+| Balance per bank statement | {{ tie.bank_ending_balance | money }} |
+| Add: deposits in transit | {{ totals.deposits_in_transit | money }} |
+| Less: outstanding checks | {{ totals.outstanding_checks | money }} |
+| Add/(less): bank errors | {{ totals.bank_errors | money }} |
+| **Adjusted bank balance** | **{{ tie.adjusted_bank_balance | money }}** |
+
+| Book side | Amount |
+| --- | ---: |
+| Balance per general ledger | {{ tie.gl_ending_balance | money }} |
+| Add: unrecorded bank credits | {{ totals.unrecorded_credits | money }} |
+| Less: unrecorded bank debits | {{ totals.unrecorded_debits | money }} |
+| Add/(less): book errors | {{ totals.book_errors | money }} |
+| **Adjusted book balance** | **{{ tie.adjusted_book_balance | money }}** |
+
+{% if tied %}
+Difference: **{{ tie.difference | money }}**. The reconciliation ties.
+{% else %}
+> **UNEXPLAINED DIFFERENCE: {{ tie.difference | money }}.** Not plugged. {{ tie.unexplained_items | length }} item(s) lack an accepted or approved finding.
+
+| Exception | Ledger | Item | Date | Description | Amount |
+| --- | --- | --- | --- | --- | ---: |
+{% for e in tie.unexplained_items %}
+| {{ e.exception_id }} | {{ e.side }} | `{{ e.item_id }}` | {{ e.item_date }} | {{ e.description }} | {{ e.amount | money }} |
+{% endfor %}
+{% endif %}
+
+## Reconciling items
+
+{% for g in groups %}
+### {{ g.label }} ({{ g.rows | length }})
+
+| Item(s) | Amount(s) | Explanation | Evidence | Status |
+| --- | ---: | --- | --- | --- |
+{% for row in g.rows %}
+| {% for it in row["items"] %}`{{ it.item_id }}`{{ " " if not loop.last }}{% endfor %} | {% for it in row["items"] %}{{ it.amount | money }}{{ " / " if not loop.last }}{% endfor %} | {{ row.explanation | replace("|", "\\|") }} | {{ row.evidence_ids | join(", ") }} | {{ row.review_status }} ({{ row.source | lower }}, {{ "%.2f" | format(row.confidence) }}) |
+{% endfor %}
+
+{% endfor %}
+## Proposed adjusting journal entries
+
+{% for je in r.journal_entries %}
+**{{ je.je_id }}** ({{ je.status }}): {{ je.memo }}
+
+| Account | Name | Debit | Credit |
+| --- | --- | ---: | ---: |
+{% for ln in je.lines %}
+| {{ ln.account }} | {{ ln.account_name }} | {{ ln.debit | money if ln.debit != "0.00" else "" }} | {{ ln.credit | money if ln.credit != "0.00" else "" }} |
+{% endfor %}
+
+{% else %}
+No book-side adjustments proposed.
+{% endfor %}
+## Needs review queue
+
+{% if review_queue %}
+| Exception | Item | Proposed type | Reasons |
+| --- | --- | --- | --- |
+{% for f in review_queue %}
+| {{ f.exception_id }} | `{{ f.item_id }}` | {{ f.finding.break_type }} | {{ f.review_reasons | join("; ") }} |
+{% endfor %}
+{% else %}
+No findings are awaiting review.
+{% endif %}
+
+## Telemetry
+
+| Metric | Value |
+| --- | --- |
+| Matches by rule | {% for rule, n in r.summary.matches_by_rule | dictsort %}{{ rule }} {{ n }}{{ ", " if not loop.last }}{% endfor %} |
+| LLM calls | {{ r.telemetry.calls }} ({{ r.telemetry.failed_calls }} failed) |
+| Tokens in / out | {{ r.telemetry.input_tokens }} / {{ r.telemetry.output_tokens }} |
+| Estimated cost (USD, estimate) | {{ r.telemetry.cost_usd }} |
+| Average latency | {{ r.telemetry.avg_latency_ms }} ms |
+| Analyst minutes saved (ASSUMPTION) | {{ r.roi.analyst_minutes_saved_ASSUMPTION }} |
+
+## Run metadata
+
+| Field | Value |
+| --- | --- |
+| Provider / model | {{ meta.provider }} / {{ meta.model }} |
+| Prompt version | {{ meta.prompt_version }} |
+| Git commit | {{ meta.git_commit or "not available" }} |
+{% for f in meta.inputs %}
+| {{ f.role }} | `{{ f.filename }}` ({{ f.rows }} rows), sha256 `{{ f.sha256 }}` |
+{% endfor %}
+
+Prepared by: {{ meta.preparer }} ______________________ Date ________
+
+Reviewed by: ______________________ Date ________

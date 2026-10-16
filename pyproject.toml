@@ -41,6 +41,10 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/tieout"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"config" = "tieout/_data/config"
+"prompts" = "tieout/_data/prompts"
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
