@@ -383,5 +383,16 @@ def eval_cmd(
     console.print("[green]All eval thresholds passed.[/green]")
 
 
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option(help="Bind address.")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port.")] = 8000,
+) -> None:  # pragma: no cover - blocking server; exercised by the API tests and Phase 10 check
+    """Run the HTTP API (OpenAPI docs at /docs)."""
+    import uvicorn
+
+    uvicorn.run("tieout.api:create_app", factory=True, host=host, port=port)
+
+
 if __name__ == "__main__":  # pragma: no cover
     app()
