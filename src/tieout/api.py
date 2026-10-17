@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from tieout import __version__
 from tieout.config import Settings
+from tieout.demo import make_router
 from tieout.io import InputError
 from tieout.money import MoneyError
 from tieout.pipeline import build_result, reconcile
@@ -116,4 +117,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def get_report(run_id: str) -> HTMLResponse:
         return HTMLResponse(render_html(load(run_id)))
 
+    # Public demo pages: stateless, always mock provider (see tieout/demo.py).
+    app.include_router(make_router(cfg))
     return app

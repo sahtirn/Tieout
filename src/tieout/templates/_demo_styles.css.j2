@@ -1,0 +1,63 @@
+  :root {
+    --ink: #1c2430; --muted: #5b6676; --rule: #d9dee5; --soft: #f5f7fa; --paper: #ffffff;
+    --bg: #eef1f5; --accent: #23395d; --accent-ink: #ffffff; --ok: #146c43; --ok-bg: #e6f4ec;
+    --bad: #b42318; --bad-bg: #fdecea; --warn: #8a5a00; --warn-bg: #fff4dc; --code: #3a4a63;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink);
+         font: 15px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--accent); }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+  .topbar { background: var(--accent); color: var(--accent-ink); }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+                  padding-top: 12px; padding-bottom: 12px; }
+  .brand { color: var(--accent-ink); text-decoration: none; font-weight: 700; font-size: 18px;
+           letter-spacing: -.01em; display: inline-flex; align-items: center; gap: 8px; }
+  .brand svg { flex: none; }
+  .nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  .nav a { color: #dbe4f3; text-decoration: none; font-size: 14px; }
+  .nav a:hover { color: #fff; text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+  .card { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px;
+          padding: 24px; margin-top: 20px; }
+  .card { min-width: 0; overflow-wrap: anywhere; }
+  h1 { font-size: 30px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 10px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent);
+       margin: 0 0 14px; }
+  .lede { font-size: 17px; color: var(--muted); max-width: 720px; margin: 0; }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-ink); border: 0;
+         border-radius: 5px; padding: 11px 18px; font-size: 15px; font-weight: 600;
+         text-decoration: none; cursor: pointer; }
+  .btn:hover { filter: brightness(1.15); }
+  .btn.secondary { background: var(--paper); color: var(--accent); border: 1px solid var(--accent); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  .badge { display: inline-block; font-weight: 700; letter-spacing: .08em; padding: 6px 14px;
+           border-radius: 4px; border: 2px solid; }
+  .badge.tied { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); }
+  .badge.unrec { color: var(--bad); background: var(--bad-bg); border-color: var(--bad); }
+  .pill { display: inline-block; font-size: 11.5px; font-weight: 600; padding: 2px 8px;
+          border-radius: 10px; background: #e8edf5; color: var(--accent); white-space: nowrap; }
+  .pill.AUTO_ACCEPTED, .pill.APPROVED { background: var(--ok-bg); color: var(--ok); }
+  .pill.NEEDS_REVIEW { background: var(--warn-bg); color: var(--warn); }
+  .callout { border-left: 4px solid var(--warn); background: var(--warn-bg); padding: 10px 14px;
+             border-radius: 0 4px 4px 0; }
+  .callout.bad { border-left-color: var(--bad); background: var(--bad-bg); }
+  input[type=number], input[type=file] { font: inherit; padding: 8px 10px; border: 1px solid var(--rule);
+                                          border-radius: 5px; background: var(--paper); max-width: 100%; }
+  label { font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px; }
+  footer { color: var(--muted); font-size: 12.5px; padding: 28px 0 40px; }
+  /* Decorative staggered reveal. Content is fully visible without it (no JS, reduced motion). */
+  .js .anim [data-reveal] { animation: tie-rise .4s ease both; animation-delay: calc(var(--i, 0) * 140ms); }
+  @keyframes tie-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .js .anim [data-reveal] { animation: none; }
+  }
+  @media (max-width: 640px) {
+    .wrap { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    .card { padding: 18px 16px; }
+    .nav { gap: 12px; }
+  }

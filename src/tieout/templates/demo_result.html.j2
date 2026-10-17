@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TieOut Demo Result</title>
+<meta name="description" content="A live TieOut bank reconciliation: matching, agent investigation, verification, and tie-out.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2323395d'/%3E%3Cpath d='M6 12.5l4 4 8-9' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add("js");</script>
+<style>
+{% include "_demo_styles.css.j2" %}
+  .summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+  .summary h1 { margin-bottom: 4px; }
+  .summary > div:first-child { flex: 1 1 420px; min-width: 0; }
+  .summary > div:last-child { flex: 0 0 auto; }
+  .big { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .stages { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .stage { background: var(--soft); border: 1px solid var(--rule); border-radius: 6px; padding: 12px; position: relative; }
+  .stage .t { font-size: 11.5px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; }
+  .stage .m { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 2px 0; }
+  .stage .d { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .grade { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .grade div { background: var(--ok-bg); color: var(--ok); border-radius: 5px; padding: 8px 12px; font-weight: 600; font-size: 14px; }
+  .grade div.miss { background: var(--bad-bg); color: var(--bad); }
+  details.case { border: 1px solid var(--rule); border-radius: 6px; margin: 8px 0; background: var(--paper); }
+  details.case[open] { border-color: #b8c3d4; }
+  details.case summary { cursor: pointer; padding: 10px 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; list-style: none; }
+  details.case summary::-webkit-details-marker { display: none; }
+  details.case summary::before { content: "\25B8"; color: var(--muted); transition: transform .15s; }
+  details.case[open] summary::before { transform: rotate(90deg); }
+  .case .amt { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .case .desc { color: var(--muted); font-size: 14px; }
+  ol.trace { list-style: none; margin: 0; padding: 4px 14px 4px 38px; position: relative; }
+  ol.trace::before { content: ""; position: absolute; left: 22px; top: 8px; bottom: 14px; width: 2px; background: var(--rule); }
+  ol.trace li { position: relative; padding: 6px 0 8px; }
+  ol.trace li::before { content: ""; position: absolute; left: -21px; top: 12px; width: 10px; height: 10px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); }
+  ol.trace li.final::before { background: var(--ok); border-color: var(--ok); }
+  ol.trace li.bad::before { background: var(--bad); border-color: var(--bad); }
+  .tool { font-weight: 600; color: var(--code); }
+  .res { font-size: 13.5px; color: var(--ink); }
+  .finding { border-top: 1px dashed var(--rule); margin: 4px 14px 0; padding: 10px 0 14px; font-size: 14px; }
+  .sched { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sched table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+  .sched td { padding: 4px 6px; }
+  .sched td.n { text-align: right; white-space: nowrap; }
+  .sched tr.tot td { border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink); font-weight: 700; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  iframe.report { width: 100%; height: 900px; border: 1px solid var(--rule); border-radius: 6px; background: #fff; }
+  @media (max-width: 900px) { .stages { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) {
+    .summary > div:last-child { text-align: left !important; }
+    .stages { grid-template-columns: repeat(2, 1fr); }
+    .sched { grid-template-columns: 1fr; }
+    .case .amt { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+{% include "_demo_topbar.html.j2" %}
+<main class="wrap anim" id="main">
+  <section class="card summary">
+    <div>
+      <div class="muted small">{% if seed %}Synthetic month {{ tie.period }}, seed {{ seed }}{% else %}Your files: {{ filename_note }}{% endif %} &middot; {{ r.entity if seed else "uploaded data" }}</div>
+      <h1>{% if r.status == "TIED" %}Reconciled. Difference {{ tie.difference | money }}.{% else %}Not reconciled. {{ tie.difference | money }} unexplained.{% endif %}</h1>
+      <div class="muted">Full pipeline ran in {{ elapsed_ms }} ms: matching, {{ items | length }} agent investigations, verification, schedule, and journal entries.</div>
+    </div>
+    <div style="text-align: right">
+      <span class="badge {{ 'tied' if r.status == 'TIED' else 'unrec' }}">{{ r.status }}</span>
+      <div class="big">{{ tie.adjusted_bank_balance | money }}</div>
+      <div class="muted small">adjusted bank balance = adjusted book balance{% if r.status != "TIED" %} (not yet){% endif %}</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="toolbar"><h2 style="margin: 0">What happened</h2><button class="btn secondary" type="button" id="replay">Replay</button></div>
+    <div class="stages">
+      {% for s in stages %}
+      <div class="stage" data-reveal style="--i: {{ loop.index0 }}">
+        <div class="t">{{ loop.index }}. {{ s.title }}</div>
+        <div class="m">{{ s.metric }}</div>
+        <div class="d">{{ s.detail }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if score %}
+    <div class="grade" data-reveal style="--i: {{ stages | length }}">
+      {% set m = score.match %}
+      <div class="{{ 'miss' if m.fp or m.fn else '' }}">Bank-to-ledger pairs vs answer key: {{ m.tp }} correct, {{ m.fp }} wrong, {{ m.fn }} missed</div>
+      <div class="{{ 'miss' if score.classification_correct != score.classification_total else '' }}">Problems classified: {{ score.classification_correct }} / {{ score.classification_total }}</div>
+      <div class="{{ '' if score.adjusted_balance_correct else 'miss' }}">Adjusted balance {{ "matches" if score.adjusted_balance_correct else "does not match" }} ground truth</div>
+    </div>
+    {% else %}
+    <p class="muted small" style="margin-top: 12px">Uploaded files have no answer key, so this run is not graded.</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Watch the agent work</h2>
+    <p class="muted small" style="margin-top: -6px">Each unmatched item was investigated with read-only tools. Click any item to see the exact calls, what came back, and the finding that passed the code checks.</p>
+    {% for it in items %}
+    <details class="case" {% if loop.first %}open{% endif %}>
+      <summary>
+        <span class="pill {{ it.review_status }}">{{ it.label }}</span>
+        <span class="mono">{{ it.item_id }}{% if it.counterpart %} + {{ it.counterpart }}{% endif %}</span>
+        <span class="desc">{{ it.description }}</span>
+        <span class="amt">{{ it.amount | money }}</span>
+      </summary>
+      <ol class="trace">
+        {% for st in it.steps %}
+        <li data-reveal style="--i: {{ loop.index0 }}" class="{{ 'final' if st.step_type in ('final', 'fallback_final') else ('bad' if st.step_type in ('invalid_finding', 'provider_error') else '') }}">
+          <span class="tool">{% if st.step_type in ('final', 'fallback_final') %}submit_finding{% else %}{{ st.tool or st.step_type }}{% endif %}</span>
+          {% if st.args and st.step_type not in ('final', 'fallback_final') %}<code>({{ st.args }})</code>{% endif %}
+          <div class="res">{{ st.result }}</div>
+        </li>
+        {% endfor %}
+      </ol>
+      <div class="finding">
+        {{ it.explanation }}
+        <div class="muted small" style="margin-top: 4px">Evidence: <span class="mono">{{ it.evidence | join(", ") }}</span> &middot; {{ it.review_status | replace("_", " ") | lower }}</div>
+      </div>
+    </details>
+    {% endfor %}
+  </section>
+
+  <section class="card">
+    <h2>Reconciliation schedule</h2>
+    <div class="sched">
+      <table>
+        <tr><td>Balance per bank</td><td class="n">{{ tie.bank_ending_balance | money }}</td></tr>
+        <tr><td>Deposits in transit</td><td class="n">{{ totals.deposits_in_transit | money }}</td></tr>
+        <tr><td>Outstanding checks</td><td class="n">{{ totals.outstanding_checks | money }}</td></tr>
+        <tr><td>Bank errors</td><td class="n">{{ totals.bank_errors | money }}</td></tr>
+        <tr class="tot"><td>Adjusted bank balance</td><td class="n">{{ tie.adjusted_bank_balance | money }}</td></tr>
+      </table>
+      <table>
+        <tr><td>Balance per books</td><td class="n">{{ tie.gl_ending_balance | money }}</td></tr>
+        <tr><td>Unrecorded bank credits</td><td class="n">{{ totals.unrecorded_credits | money }}</td></tr>
+        <tr><td>Unrecorded bank debits</td><td class="n">{{ totals.unrecorded_debits | money }}</td></tr>
+        <tr><td>Book errors</td><td class="n">{{ totals.book_errors | money }}</td></tr>
+        <tr class="tot"><td>Adjusted book balance</td><td class="n">{{ tie.adjusted_book_balance | money }}</td></tr>
+      </table>
+    </div>
+    <div class="row" style="margin-top: 18px">
+      {% if seed %}
+      <a class="btn" href="/demo/report?seed={{ seed }}" target="_blank" rel="noopener">Open the sign-off workpaper</a>
+      <a class="btn secondary" href="/demo/audit?seed={{ seed }}">Audit trail (JSONL)</a>
+      <a class="btn secondary" href="/demo/run">Run a different month</a>
+      {% else %}
+      <a class="btn secondary" href="/">Back to the demo</a>
+      {% endif %}
+    </div>
+    {% if seed %}
+    <p class="muted small">Inputs: <a href="/demo/data/{{ seed }}/bank_statement.csv">bank statement</a>,
+      <a href="/demo/data/{{ seed }}/gl_cash.csv">general ledger</a>, and the
+      <a href="/demo/data/{{ seed }}/labels.json">answer key</a>.</p>
+    {% endif %}
+  </section>
+
+  {% if report_srcdoc %}
+  <section class="card">
+    <h2>Sign-off workpaper</h2>
+    <iframe class="report" title="Reconciliation workpaper" srcdoc="{{ report_srcdoc }}"></iframe>
+  </section>
+  {% endif %}
+
+  <footer>
+    Mock mode: the investigator runs TieOut's deterministic policy through the same tool-calling
+    loop and validation the Gemini agent uses. Synthetic data, fictional names. Run ID
+    <span class="mono">{{ r.run_id }}</span>. <a href="{{ repo_url }}">Source on GitHub</a>.
+  </footer>
+</main>
+<script>
+(function () {
+  var main = document.getElementById("main");
+  function restart() { main.classList.remove("anim"); void main.offsetWidth; main.classList.add("anim"); }
+  document.getElementById("replay").addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    restart();
+  });
+})();
+</script>
+</body>
+</html>

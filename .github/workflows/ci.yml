@@ -28,9 +28,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
       - name: Ruff lint
-        run: ruff check src tests
+        run: ruff check src tests app.py
       - name: Ruff format check
-        run: ruff format --check src tests
+        run: ruff format --check src tests app.py
       - name: Mypy (strict)
         run: mypy
       - name: Pytest with coverage
