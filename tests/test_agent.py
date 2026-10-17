@@ -478,6 +478,13 @@ def test_gemini_adapter_parses_function_calls_and_retries() -> None:
     assert len(sleeps) == 1 and resp.raw == "RAW"
     sent = client.models.calls[-1]
     assert sent["model"] == "gemini-3.6-flash" and len(sent["contents"]) == 4
+    # Gemini 3 should run at the model's default temperature unless explicitly overridden.
+    assert sent["config"].temperature is None
+    assert sent["config"].tool_config.function_calling_config.mode == "ANY"
+    tuned = GeminiProvider(
+        Settings(gemini_temperature=0.3), client=_Client([]), sleep=sleeps.append
+    )
+    assert tuned._config("s", []).temperature == 0.3
 
 
 def test_gemini_adapter_text_and_non_retryable_errors() -> None:

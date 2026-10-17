@@ -205,3 +205,12 @@ defensible for a finance audience. Entries marked **Review** deserve a human loo
 - **Rationale:** The brief's "do not push" held for the build itself. The work ran in an ephemeral
   cloud container, so pushing on the owner's instruction was the only way to keep it once the
   container is reclaimed.
+
+## D-029 Gemini runs at the model's default temperature
+- **Decision:** The Gemini provider no longer sets `temperature=0`. `GEMINI_TEMPERATURE` is
+  optional and unset by default, so the model's own default applies.
+- **Alternatives:** Temperature 0 for determinism (the original choice).
+- **Rationale:** Google's Gemini 3 developer guide strongly recommends keeping temperature at the
+  default of 1.0 and warns that lower values can cause looping or degraded reasoning. Determinism
+  is not needed for correctness here: every finding is validated by code, and the mock provider
+  covers reproducible CI. Found during the pre-showcase review, before any live run.

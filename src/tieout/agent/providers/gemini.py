@@ -38,6 +38,7 @@ class GeminiProvider(LLMProvider):
         self.types = types
         self.model = settings.gemini_model
         self.max_retries = settings.gemini_max_retries
+        self.temperature = settings.gemini_temperature
         self._sleep = sleep
         self.client = client or genai.Client(
             api_key=settings.gemini_api_key,
@@ -86,7 +87,7 @@ class GeminiProvider(LLMProvider):
         ]
         return t.GenerateContentConfig(
             system_instruction=system,
-            temperature=0,
+            temperature=self.temperature,  # None means the model default
             tools=[t.Tool(function_declarations=decls)],
             tool_config=t.ToolConfig(function_calling_config=t.FunctionCallingConfig(mode="ANY")),
             automatic_function_calling=t.AutomaticFunctionCallingConfig(disable=True),

@@ -1,12 +1,16 @@
 # TieOut
 
-[![CI](https://github.com/<OWNER>/tieout/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/tieout/actions/workflows/ci.yml)
+[![CI](https://github.com/sahtirn/Tieout/actions/workflows/ci.yml/badge.svg)](https://github.com/sahtirn/Tieout/actions/workflows/ci.yml)
+![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
 **An auditable AI agent that performs month-end bank reconciliations and ties to the penny, or tells you exactly why it doesn't.**
 
 Deterministic code matches transactions and does every calculation. A tool-using LLM agent investigates only the exceptions, classifies them, and explains them in plain English. Every claim the model makes is checked by code before it can touch the reconciliation. Every call is metered, every step is logged, and accuracy is measured against ground truth in CI.
 
-> See the output without running anything: [sample workpaper (HTML)](docs/sample/report.html) · [Markdown](docs/sample/report.md) · [eval summary](docs/sample/eval_summary.md) · [audit traces](docs/sample/audit_traces.jsonl)
+[![Sample reconciliation workpaper: TIED to 0.00](docs/images/report-preview.png)](https://htmlpreview.github.io/?https://github.com/sahtirn/Tieout/blob/main/docs/sample/report.html)
+
+> See the output without running anything: [full sample workpaper (rendered)](https://htmlpreview.github.io/?https://github.com/sahtirn/Tieout/blob/main/docs/sample/report.html) · [HTML source](docs/sample/report.html) · [Markdown](docs/sample/report.md) · [eval summary](docs/sample/eval_summary.md) · [audit traces](docs/sample/audit_traces.jsonl)
 
 ---
 
@@ -66,8 +70,10 @@ flowchart LR
 
 ## Quickstart (mock mode, no API key)
 
+Requires Python 3.11 or newer.
+
 ```bash
-pip install -e ".[dev]"
+git clone https://github.com/sahtirn/Tieout && cd Tieout && pip install -e ".[dev]"
 tieout generate --seed 42 --month 2026-09 --out data/
 tieout reconcile --bank data/bank_statement.csv --gl data/gl_cash.csv
 ```
@@ -91,7 +97,7 @@ tieout eval --seeds 5 --provider gemini
 GEMINI_API_KEY=... pytest -m live
 ```
 
-The Gemini provider uses the official `google-genai` SDK with manual function calling (mode `ANY`), so the final answer arrives as structured `submit_finding` arguments. It retries 429/5xx/timeouts with exponential backoff and captures token usage for cost telemetry. The default model is `gemini-3.6-flash`; change `GEMINI_MODEL` as models evolve.
+The Gemini provider uses the official `google-genai` SDK with manual function calling (mode `ANY`), so the final answer arrives as structured `submit_finding` arguments. It retries 429/5xx/timeouts with exponential backoff and captures token usage for cost telemetry. The default model is `gemini-3.6-flash`; change `GEMINI_MODEL` as models evolve. Temperature is left at the model default, per Google's guidance for Gemini 3 models; set `GEMINI_TEMPERATURE` only if you have measured a reason to.
 
 ## Latest eval results
 

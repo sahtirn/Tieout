@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-3.6-flash"
     gemini_timeout_s: int = 60
     gemini_max_retries: int = 4
+    # None keeps the model default. Google recommends the default (1.0) for Gemini 3 models;
+    # lower values can cause looping (docs/DECISIONS.md D-029).
+    gemini_temperature: float | None = Field(default=None, ge=0, le=2)
     date_window_days: int = Field(default=3, ge=0, le=31)
     review_confidence_threshold: float = Field(default=0.80, ge=0, le=1)
     max_agent_steps: int = Field(default=6, ge=1, le=50)
