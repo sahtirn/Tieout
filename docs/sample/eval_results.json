@@ -1,0 +1,691 @@
+{
+  "failures": [],
+  "generated_at": "2026-10-16 19:00 UTC",
+  "metrics": {
+    "adjusted_balance_accuracy": 1.0,
+    "avg_llm_latency_ms": 0,
+    "avg_run_wall_ms": 498,
+    "classification_accuracy": 1.0,
+    "classification_items": 625,
+    "confusion_matrix": {
+      "BANK_ERROR": {
+        "BANK_ERROR": 50
+      },
+      "BANK_FEE_UNRECORDED": {
+        "BANK_FEE_UNRECORDED": 75
+      },
+      "DEPOSIT_IN_TRANSIT": {
+        "DEPOSIT_IN_TRANSIT": 75
+      },
+      "GL_DUPLICATE": {
+        "GL_DUPLICATE": 50
+      },
+      "GL_TRANSPOSITION": {
+        "GL_TRANSPOSITION": 100
+      },
+      "GL_WRONG_AMOUNT": {
+        "GL_WRONG_AMOUNT": 100
+      },
+      "INTEREST_UNRECORDED": {
+        "INTEREST_UNRECORDED": 25
+      },
+      "NSF_RETURN_UNRECORDED": {
+        "NSF_RETURN_UNRECORDED": 50
+      },
+      "OUTSTANDING_CHECK": {
+        "OUTSTANDING_CHECK": 100
+      }
+    },
+    "cost_usd_per_run": "0.000000",
+    "cost_usd_total": "0.000000",
+    "llm_calls_per_run": 85.0,
+    "match": {
+      "f1": 1.0,
+      "fn": 0,
+      "fp": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tp": 10330
+    },
+    "needs_review_rate": 0.0,
+    "per_type_accuracy": {
+      "BANK_ERROR": {
+        "accuracy": 1.0,
+        "correct": 50,
+        "n": 50
+      },
+      "BANK_FEE_UNRECORDED": {
+        "accuracy": 1.0,
+        "correct": 75,
+        "n": 75
+      },
+      "DEPOSIT_IN_TRANSIT": {
+        "accuracy": 1.0,
+        "correct": 75,
+        "n": 75
+      },
+      "GL_DUPLICATE": {
+        "accuracy": 1.0,
+        "correct": 50,
+        "n": 50
+      },
+      "GL_TRANSPOSITION": {
+        "accuracy": 1.0,
+        "correct": 100,
+        "n": 100
+      },
+      "GL_WRONG_AMOUNT": {
+        "accuracy": 1.0,
+        "correct": 100,
+        "n": 100
+      },
+      "INTEREST_UNRECORDED": {
+        "accuracy": 1.0,
+        "correct": 25,
+        "n": 25
+      },
+      "NSF_RETURN_UNRECORDED": {
+        "accuracy": 1.0,
+        "correct": 50,
+        "n": 50
+      },
+      "OUTSTANDING_CHECK": {
+        "accuracy": 1.0,
+        "correct": 100,
+        "n": 100
+      }
+    },
+    "tie_out_rate": 1.0
+  },
+  "model": "mock",
+  "month": "2026-09",
+  "per_seed": [
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 412
+      },
+      "needs_review": 0,
+      "run_wall_ms": 510,
+      "seed": 1,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 411
+      },
+      "needs_review": 0,
+      "run_wall_ms": 477,
+      "seed": 2,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 419
+      },
+      "needs_review": 0,
+      "run_wall_ms": 512,
+      "seed": 3,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 415
+      },
+      "needs_review": 0,
+      "run_wall_ms": 478,
+      "seed": 4,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 404
+      },
+      "needs_review": 0,
+      "run_wall_ms": 506,
+      "seed": 5,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 420
+      },
+      "needs_review": 0,
+      "run_wall_ms": 528,
+      "seed": 6,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 411
+      },
+      "needs_review": 0,
+      "run_wall_ms": 513,
+      "seed": 7,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 415
+      },
+      "needs_review": 0,
+      "run_wall_ms": 481,
+      "seed": 8,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 403
+      },
+      "needs_review": 0,
+      "run_wall_ms": 479,
+      "seed": 9,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 411
+      },
+      "needs_review": 0,
+      "run_wall_ms": 517,
+      "seed": 10,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 415
+      },
+      "needs_review": 0,
+      "run_wall_ms": 502,
+      "seed": 11,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 419
+      },
+      "needs_review": 0,
+      "run_wall_ms": 498,
+      "seed": 12,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 418
+      },
+      "needs_review": 0,
+      "run_wall_ms": 547,
+      "seed": 13,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 411
+      },
+      "needs_review": 0,
+      "run_wall_ms": 488,
+      "seed": 14,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 411
+      },
+      "needs_review": 0,
+      "run_wall_ms": 487,
+      "seed": 15,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 406
+      },
+      "needs_review": 0,
+      "run_wall_ms": 504,
+      "seed": 16,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 409
+      },
+      "needs_review": 0,
+      "run_wall_ms": 478,
+      "seed": 17,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 412
+      },
+      "needs_review": 0,
+      "run_wall_ms": 493,
+      "seed": 18,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 407
+      },
+      "needs_review": 0,
+      "run_wall_ms": 493,
+      "seed": 19,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 413
+      },
+      "needs_review": 0,
+      "run_wall_ms": 504,
+      "seed": 20,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 422
+      },
+      "needs_review": 0,
+      "run_wall_ms": 484,
+      "seed": 21,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 415
+      },
+      "needs_review": 0,
+      "run_wall_ms": 497,
+      "seed": 22,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 412
+      },
+      "needs_review": 0,
+      "run_wall_ms": 474,
+      "seed": 23,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 423
+      },
+      "needs_review": 0,
+      "run_wall_ms": 518,
+      "seed": 24,
+      "tied": true
+    },
+    {
+      "adjusted_balance_abs_error": "0.00",
+      "adjusted_balance_correct": true,
+      "avg_llm_latency_ms": 0,
+      "classification_correct": 25,
+      "classification_total": 25,
+      "cost_usd": "0.000000",
+      "difference": "0.00",
+      "findings": 21,
+      "llm_calls": 85,
+      "match": {
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tp": 416
+      },
+      "needs_review": 0,
+      "run_wall_ms": 487,
+      "seed": 25,
+      "tied": true
+    }
+  ],
+  "prompt_version": "investigator_v1",
+  "provider": "mock",
+  "runs": 25,
+  "seeds": [
+    1,
+    25
+  ],
+  "thresholds": {
+    "classification_accuracy": 0.95,
+    "match_f1": 0.98,
+    "tie_out_rate": 1.0
+  }
+}

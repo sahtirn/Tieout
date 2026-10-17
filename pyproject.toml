@@ -1,0 +1,88 @@
+[project]
+name = "tieout"
+version = "0.1.0"
+description = "Auditable AI agent for month-end bank reconciliations that ties to the penny."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "TieOut contributors" }]
+dependencies = [
+    "duckdb>=1.1",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "typer>=0.12",
+    "rich>=13.7",
+    "jinja2>=3.1",
+    "fastapi>=0.111",
+    "uvicorn>=0.30",
+    "python-multipart>=0.0.9",
+    "rapidfuzz>=3.9",
+    "google-genai>=1.0",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Repository = "https://github.com/sahtirn/Tieout"
+Issues = "https://github.com/sahtirn/Tieout/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "httpx>=0.27",
+    "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+tieout = "tieout.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tieout"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"config" = "tieout/_data/config"
+"prompts" = "tieout/_data/prompts"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "C4", "PTH", "DTZ"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["DTZ"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+packages = ["tieout"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["rapidfuzz.*", "duckdb.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]
+markers = ["live: hits a real LLM API; skipped unless GEMINI_API_KEY is set"]
+
+[tool.coverage.run]
+source = ["tieout"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = true

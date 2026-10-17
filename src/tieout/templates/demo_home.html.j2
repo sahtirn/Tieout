@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TieOut Live Demo</title>
+<meta name="description" content="Run an auditable AI bank reconciliation in your browser. Deterministic math, a tool-using investigator agent, and a tie-out to the penny.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2323395d'/%3E%3Cpath d='M6 12.5l4 4 8-9' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+{% include "_demo_styles.css.j2" %}
+  .hero { padding: 40px 0 8px; }
+  .steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .step4 { background: var(--soft); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; }
+  .step4 .n { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .06em; }
+  .step4 h3 { margin: 4px 0 6px; font-size: 16px; }
+  .step4 p { margin: 0; font-size: 14px; color: var(--muted); }
+  .who { font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 9px; margin-left: 6px; }
+  .who.code { background: #e8edf5; color: var(--accent); }
+  .who.ai { background: #efe7fb; color: #5b3b99; }
+  .who.human { background: var(--ok-bg); color: var(--ok); }
+  .cta { display: grid; gap: 16px; border-top: 4px solid var(--accent); }
+  .big-btn { font-size: 16px; padding: 13px 22px; }
+  .upload-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 12px 0 14px; }
+  @media (max-width: 820px) {
+    .steps4 { grid-template-columns: 1fr 1fr; }
+    .upload-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 480px) { .steps4 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+{% include "_demo_topbar.html.j2" %}
+<main class="wrap">
+  <section class="hero">
+    <h1>Bank reconciliations that tie to the penny, with an AI agent that shows its work.</h1>
+    <p class="lede">TieOut matches a month of bank and ledger activity, sends a tool-using agent to
+      investigate only what doesn't match, checks every claim the agent makes with code, and
+      produces a sign-off workpaper. Run one now; it takes about a second.</p>
+  </section>
+
+  {% if upload_error %}
+  <div class="card callout bad" role="alert">{{ upload_error }}</div>
+  {% endif %}
+
+  <section class="card cta">
+    <div>
+      <h2>Run a live reconciliation</h2>
+      <p style="margin: 0">Generates a fresh synthetic month (about 400 bank lines and 420 ledger lines
+        with 25 planted problems), reconciles it end to end, and grades the result against the answer key.</p>
+    </div>
+    <form class="row" action="/demo/run" method="get">
+      <button class="btn big-btn" type="submit">Run a reconciliation</button>
+      <label class="muted small" for="seed" style="display: inline; font-weight: 400; margin: 0">seed</label>
+      <input id="seed" type="number" name="seed" min="1" max="{{ max_seed }}" value="{{ suggested_seed }}" style="width: 120px">
+    </form>
+    <p class="muted small" style="margin: 0">Same seed, same month, so any result can be shared and
+      reproduced. <a href="/demo/run?seed=42">Seed 42</a> is the run shown in the README.</p>
+  </section>
+
+  <section class="card">
+    <h2>How it works</h2>
+    <div class="steps4">
+      <div class="step4"><div class="n">1 &middot; MATCH <span class="who code">code</span></div>
+        <h3>Pair the obvious</h3><p>Exact, near-date, and batch-deposit matching clears about 95% of lines. Each match records why.</p></div>
+      <div class="step4"><div class="n">2 &middot; INVESTIGATE <span class="who ai">AI agent</span></div>
+        <h3>Work the leftovers</h3><p>For each exception the agent calls read-only tools (search, transposition check, duplicate check, bank codes) and classifies it.</p></div>
+      <div class="step4"><div class="n">3 &middot; VERIFY <span class="who code">code</span></div>
+        <h3>Trust, but check</h3><p>Every cited transaction must exist, the type must fit the ledger and sign, and a claimed digit swap must really be one.</p></div>
+      <div class="step4"><div class="n">4 &middot; TIE OUT <span class="who human">human signs</span></div>
+        <h3>Prove it, then approve</h3><p>Code computes the schedule to 0.00 and drafts balanced journal entries. A reviewer approves; the preparer cannot.</p></div>
+    </div>
+    <p class="muted small" style="margin-top: 14px">The model never does the math. If it hallucinates
+      or breaks a rule, the item goes to human review and the reconciliation stays honestly unreconciled.</p>
+  </section>
+
+  <section class="card">
+    <h2>Reconcile your own files</h2>
+    <form action="/demo/upload" method="post" enctype="multipart/form-data">
+      <div class="upload-grid">
+        <div><label for="bank">Bank statement CSV</label><input id="bank" type="file" name="bank_statement" accept=".csv,text/csv" required></div>
+        <div><label for="gl">GL cash detail CSV</label><input id="gl" type="file" name="gl_cash" accept=".csv,text/csv" required></div>
+      </div>
+      <button class="btn secondary" type="submit">Reconcile my files</button>
+    </form>
+    <p class="muted small">Expected columns are shown in the samples:
+      <a href="/demo/data/42/bank_statement.csv">bank_statement.csv</a> and
+      <a href="/demo/data/42/gl_cash.csv">gl_cash.csv</a>. Up to 2 MB and 5,000 rows each.
+      Files are processed in memory and not stored. Please use synthetic data only.</p>
+  </section>
+
+  <footer>
+    This public demo runs the agent in mock mode: TieOut's deterministic investigation policy drives
+    the same tool-calling loop the Gemini agent uses, so it is free and reproducible. All data is
+    synthetic and every name is fictional. Unaffiliated with any employer. TieOut v{{ version }},
+    MIT licensed, <a href="{{ repo_url }}">source on GitHub</a>.
+  </footer>
+</main>
+</body>
+</html>

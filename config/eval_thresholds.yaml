@@ -1,0 +1,10 @@
+# Minimum scores. `tieout eval` exits non-zero if any threshold for the active provider is missed.
+mock:
+  tie_out_rate: 1.00
+  match_f1: 0.98
+  classification_accuracy: 0.95
+# Live models are non-deterministic; these are tracking targets, not CI gates.
+gemini:
+  tie_out_rate: 0.90
+  match_f1: 0.98
+  classification_accuracy: 0.90
