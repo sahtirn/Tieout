@@ -3,6 +3,7 @@
 [![CI](https://github.com/sahtirn/Tieout/actions/workflows/ci.yml/badge.svg)](https://github.com/sahtirn/Tieout/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/sahtirn/Tieout?quickstart=1)
 
 **An auditable AI agent that performs month-end bank reconciliations and ties to the penny, or tells you exactly why it doesn't.**
 
@@ -70,7 +71,9 @@ flowchart LR
 
 ## Quickstart (mock mode, no API key)
 
-Requires Python 3.11 or newer.
+**Fastest:** click **Open in GitHub Codespaces** above. The project installs itself in a browser-based environment with the seed 42 data already generated; run `tieout serve` and the live demo opens on port 8000.
+
+**On your machine** (Python 3.11 or newer):
 
 ```bash
 git clone https://github.com/sahtirn/Tieout && cd Tieout && pip install -e ".[dev]"
@@ -85,8 +88,14 @@ tieout eval --seeds 25            # scored against ground truth; non-zero exit o
 tieout audit <run_id>             # JSONL audit trail
 tieout review <run_id>            # approve or reject NEEDS_REVIEW items and proposed JEs
 tieout telemetry                  # calls, tokens, cost, latency, failure rate, ROI assumption
-tieout serve                      # API at http://127.0.0.1:8000/docs
+tieout serve                      # live demo at http://127.0.0.1:8000, API docs at /docs
 ```
+
+### The live demo
+
+`tieout serve` (or any deployment) serves a one-click demo at `/`. It generates a seeded synthetic month, runs the full pipeline, and shows each stage, a live grade against the answer key, and a replayable trace of every tool call the agent made. The sign-off workpaper, audit trail, inputs, and answer key are one click away, and visitors can upload their own two CSVs. The demo is stateless and always uses the mock provider, so it is safe to host publicly and costs nothing to run.
+
+To host it on Vercel, import this repository at [vercel.com/new](https://vercel.com/new) and click Deploy. `app.py` and `vercel.json` are already set up; no environment variables are required.
 
 ### With Gemini
 
